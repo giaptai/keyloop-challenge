@@ -1,0 +1,5 @@
+rootProject.name = 'scenariod'
+
+include 'document-viewer'
+include 'sales-mock'
+include 'service-mock'

@@ -1,0 +1,56 @@
+[
+  {
+    "documentId": "SVC-001",
+    "vin": "1HGCM82633A004352",
+    "title": "Initial Service Order",
+    "documentType": "SERVICE_ORDER",
+    "status": "COMPLETED",
+    "referenceNumber": "WO-2026-00088",
+    "createdAt": "2026-02-20T08:30:00"
+  },
+  {
+    "documentId": "SVC-002",
+    "vin": "1HGCM82633A004352",
+    "title": "Inspection Report",
+    "documentType": "INSPECTION_REPORT",
+    "status": "COMPLETED",
+    "referenceNumber": "INS-2026-00412",
+    "createdAt": "2026-05-14T10:15:00"
+  },
+  {
+    "documentId": "SVC-003",
+    "vin": "1FTFW1ET5DFC10312",
+    "title": "Initial Service Order",
+    "documentType": "SERVICE_ORDER",
+    "status": "COMPLETED",
+    "referenceNumber": "WO-2026-00197",
+    "createdAt": "2026-04-02T09:00:00"
+  },
+  {
+    "documentId": "SVC-004",
+    "vin": "1FTFW1ET5DFC10312",
+    "title": "Brake System Repair Record",
+    "documentType": "REPAIR_RECORD",
+    "status": "COMPLETED",
+    "referenceNumber": "RPR-2026-00033",
+    "createdAt": "2026-06-18T13:40:00"
+  },
+  {
+    "documentId": "SVC-005",
+    "vin": "1FTFW1ET5DFC10312",
+    "title": "Inspection Report",
+    "documentType": "INSPECTION_REPORT",
+    "status": "IN_PROGRESS",
+    "referenceNumber": "INS-2026-00578",
+    "createdAt": "2026-10-22T15:00:00"
+  },
+  {
+    "documentId": "SVC-006",
+    "vin": "JH4KA9650MC000001",
+    "title": "Water Pump Replacement Record",
+    "documentType": "REPAIR_RECORD",
+    "status": "COMPLETED",
+    "referenceNumber": "RPR-2026-00041",
+    "createdAt": "2026-07-30T11:25:00"
+  }
+]

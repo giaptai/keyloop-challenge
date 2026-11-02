@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:16.15-bookworm
+    environment:
+      - POSTGRES_DB=documentviewer
+      - POSTGRES_USER=keyloop
+      - POSTGRES_PASSWORD=keyloop
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
