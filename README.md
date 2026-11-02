@@ -69,7 +69,7 @@ Database settings (development defaults, in `document-viewer` configuration): da
 ## Test
 
 ### Mock data
-Number of documents per VIN in the mock data: [service](service-mock\src\main\resources\mock-data\service-documents.json), [sales](sales-mock\src\main\resources\mock-data\sales-documents.json)
+Number of documents per VIN in the mock data: [service](service-mock/src/main/resources/mock-data/service-documents.json), [sales](sales-mock/src/main/resources/mock-data/sales-documents.json)
 
 | VIN | SALES | SERVICE |
 |---|---:|---:|
