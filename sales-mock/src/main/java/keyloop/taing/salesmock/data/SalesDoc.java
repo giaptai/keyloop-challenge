@@ -10,5 +10,5 @@ public record SalesDoc(
         String status,
         String referenceNumber,
         LocalDateTime createdAt,
-        String filename) {
+        String fileName) {
 }
