@@ -20,12 +20,17 @@ public class SalesBusiness {
 
     public SalesBusiness(ObjectMapper objectMapper) throws IOException {
         try (InputStream ip = new ClassPathResource(SALES_MOCK_FILE).getInputStream()) {
-            List<SalesDoc> salesMock = objectMapper.readValue(ip, new TypeReference<List<SalesDoc>>() {});
+            List<SalesDoc> salesMock = objectMapper.readValue(ip, new TypeReference<List<SalesDoc>>() {
+            });
             sales = salesMock.stream().collect(Collectors.groupingBy(t -> t.vin()));
         }
     }
 
-    public List<SalesDoc> getDocuments(String vin){
+    public List<SalesDoc> getDocuments(String vin) {
         return sales.getOrDefault(vin, List.of());
+    }
+
+    public boolean vehicleExists(String vin) {
+        return sales.containsKey(vin);
     }
 }
