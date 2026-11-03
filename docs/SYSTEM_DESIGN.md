@@ -1,7 +1,7 @@
 ## System Design Document – Unified Document Viewer
 
 ### 1. Architecture diagram
-![Overview](docs/keyloop-exercise-overview.drawio.png)
+![Overview](/docs/keyloop-exercise-overview.drawio.png)
 
 ### 2. Module description
 | Component | Responsibility |
