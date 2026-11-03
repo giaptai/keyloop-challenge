@@ -13,9 +13,9 @@
 | PostgreSQL (docker-compose) | store snapshot by VIN and source |
 
 ### 3. Data flow
-![document-viewer-flow](docs/keyloop-exercise-document_viewer_sequence-flow.drawio.png)
+![document-viewer-flow](/docs/keyloop-exercise-document_viewer_sequence-flow.drawio.png)
 
-![apimock-flow](docs/docs/keyloop-exercise-apimock-sequence-flow.drawio.png)
+![apimock-flow](/docs/keyloop-exercise-apimock-sequence-flow.drawio.png)
 
 ### 4. Technologies stack
 | Technology | Why choose |
