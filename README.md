@@ -120,10 +120,30 @@ Number of documents per VIN in the mock data: [service](service-mock/src/main/re
     curl "http://localhost:8082/api/sales/vehicles/1FTFW1ET5DFC10312/documents"
     curl "http://localhost:8083/api/service/vehicles/1FTFW1ET5DFC10312/documents"
     ```
+
 ## AI Collaboration Narrative
 
 ### AI Collaboration Strategy
 
+I used AI to support me during development:
+- Understand the assignment requirements.
+- Generate unit tests, such as `DocumentViewerBusinessTest`.
+- Discuss technical choices, such as thread pool size and concurrent requests.
+- Find different ways to solve problems.
+
 ### Verification and Refinement
 
+I reviewed AI-generated code and suggestions before using them.
+- Checked whether the generated tests worked correctly.
+- Compared suggested solutions with the assignment requirements.
+- Considered the pros and cons before choosing a solution.
+- Removed suggestions that added unnecessary complexity.
+
 ### Final Code Quality
+
+I made the final decisions and reviewed the code myself.
+I focused on keeping the code:
+- Easy to read.
+- Easy to maintain.
+- Close to the assignment requirements.
+- Free from unnecessary features.
