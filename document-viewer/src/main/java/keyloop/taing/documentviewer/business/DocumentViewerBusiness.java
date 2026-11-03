@@ -12,6 +12,8 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class DocumentViewerBusiness {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerBusiness.class);
     private final DocumentRepository documentRepository;
     private final SalesClient salesClient;
     private final ServiceClient serviceClient;
@@ -61,6 +64,7 @@ public class DocumentViewerBusiness {
                         return salesClient.fetchDocuments(vin).stream()
                                 .map(sale -> new UnifiedDocument(sale.documentId(), sale.vin(), sale.title(),
                                         sale.documentType(), sale.status(), sale.referenceNumber(), sale.createdAt(),
+                                        sale.fileName(),
                                         Source.SALES))
                                 .toList();
                     }
@@ -74,7 +78,7 @@ public class DocumentViewerBusiness {
                         () -> serviceClient.fetchDocuments(vin).stream()
                                 .map(service -> new UnifiedDocument(service.documentId(), service.vin(),
                                         service.title(), service.documentType(), service.status(),
-                                        service.referenceNumber(), service.createdAt(), Source.SERVICE))
+                                        service.referenceNumber(), service.createdAt(), null, Source.SERVICE))
                                 .toList(),
                         executor)
                 .handle((result, ex) -> {
@@ -89,6 +93,7 @@ public class DocumentViewerBusiness {
             CompletableFuture.runAsync(() -> _saveSnapshot(vin, Source.SALES, sales), executor);
             salesStatus = _statusOf(Source.SALES, null);
         } else {
+            LOGGER.warn("SALES call failed for vin={}", vin, errors[0]);
             Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SALES);
             if (snap.isPresent()) {
                 sales = snap.map(t -> _readDocuments(t)).orElse(List.of());
@@ -106,6 +111,7 @@ public class DocumentViewerBusiness {
             CompletableFuture.runAsync(() -> _saveSnapshot(vin, Source.SERVICE, services), executor);
             servicesStatus = _statusOf(Source.SERVICE, null);
         } else {
+            LOGGER.warn("SERVICE call failed for vin={}", vin, errors[1]);
             Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SERVICE);
             if (snap.isPresent()) {
                 services = snap.map(t -> _readDocuments(t)).orElse(List.of());
@@ -116,12 +122,16 @@ public class DocumentViewerBusiness {
             }
         }
         if (!_isUsable(salesStatus) && !_isUsable(servicesStatus)) {
+            LOGGER.error("Both sources unavailable for vin={} sales={} service={}",
+                    vin, salesStatus.status(), servicesStatus.status());
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Both APIs are unavailable.");
         }
         List<UnifiedDocument> merged = Stream.concat(sales.stream(), services.stream())
                 .sorted(Comparator.comparing(UnifiedDocument::createdAt))
                 .toList();
 
+        LOGGER.info("vin={} sales={} service={} documents={}", vin, salesStatus.status(), servicesStatus.status(),
+                merged.size());
         return new SuccessRes(vin, merged, List.of(salesStatus, servicesStatus));
     }
 
@@ -156,17 +166,17 @@ public class DocumentViewerBusiness {
             snapshot.setFetchedAt(LocalDateTime.now());
             documentRepository.save(snapshot);
         } catch (JacksonException e) {
-            throw new RuntimeException("Failed to serialize documents.", e);
+            LOGGER.warn("Cannot serialize snapshot for vin={} source={}", vin, source, e);
         } catch (DataAccessException e) {
-            // throw new RuntimeException(e.getMessage());
+            LOGGER.warn("Cannot save snapshot for vin={} source={}", vin, source, e);
         }
     }
 
     private Optional<DocumentSnapshot> _loadSnapshot(String vin, Source source) {
         try {
             return documentRepository.findByVinAndSource(vin, source);
-
         } catch (DataAccessException e) {
+            LOGGER.warn("Cannot load snapshot for vin={} source={}", vin, source, e);
             return Optional.empty();
         }
     }
@@ -176,6 +186,7 @@ public class DocumentViewerBusiness {
             return objectMapper.readValue(snap.getPayload(), new TypeReference<List<UnifiedDocument>>() {
             });
         } catch (Exception e) {
+            LOGGER.warn("Cannot parse snapshot for source={}", snap.getSource(), e);
             return List.of();
         }
     }
