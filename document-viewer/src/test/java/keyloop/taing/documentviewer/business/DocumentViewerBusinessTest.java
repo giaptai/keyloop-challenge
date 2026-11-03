@@ -1,5 +1,7 @@
 package keyloop.taing.documentviewer.business;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.dao.QueryTimeoutException;
 import keyloop.taing.documentviewer.client.SalesClient;
 import keyloop.taing.documentviewer.client.ServiceClient;
 import keyloop.taing.documentviewer.data.DocumentSnapshot;
@@ -161,6 +164,33 @@ public class DocumentViewerBusinessTest {
         assertThat(res.sources()).extracting("status").containsExactly("OK", "UNAVAILABLE");
     }
 
+    @Test
+    void dbQueryTimeout_stillReturnsHealthySource() {
+        when(salesClient.fetchDocuments(VIN)).thenReturn(List.of(salesDoc("SAL-1", "2026-03-12T14:00:00")));
+        when(serviceClient.fetchDocuments(VIN)).thenThrow(new RuntimeException("down"));
+        when(documentRepository.findByVinAndSource(VIN, Source.SERVICE))
+                .thenThrow(new QueryTimeoutException("statement timeout"));
+        when(documentRepository.findByVinAndSource(VIN, Source.SALES))
+                .thenThrow(new QueryTimeoutException("statement timeout"));
+
+        var res = business.search(VIN);
+
+        assertThat(res.documents()).extracting(UnifiedDocument::documentId).containsExactly("SAL-1");
+        assertThat(res.sources()).extracting("status").containsExactly("OK", "UNAVAILABLE");
+    }
+
+    @Test
+    void dbUnavailable_duringSave_stillReturnsOk() {
+        when(salesClient.fetchDocuments(VIN)).thenReturn(List.of(salesDoc("SAL-1", "2026-03-12T14:00:00")));
+        when(serviceClient.fetchDocuments(VIN)).thenReturn(List.of(serviceDoc("SVC-1", "2026-04-02T09:00:00")));
+        when(documentRepository.findByVinAndSource(anyString(), any()))
+                .thenThrow(new DataAccessResourceFailureException("db down"));
+
+        var res = business.search(VIN);
+
+        assertThat(res.sources()).extracting("status").containsExactly("OK", "OK");
+    }
+
     private SalesDoc salesDoc(String id, String createdAt) {
         return new SalesDoc(id, VIN, "Title", "PURCHASE_AGREEMENT", "SIGNED", "REF",
                 LocalDateTime.parse(createdAt), "file.pdf");
@@ -173,7 +203,7 @@ public class DocumentViewerBusinessTest {
 
     private UnifiedDocument unified(String id, Source source, String createdAt) {
         return new UnifiedDocument(id, VIN, "Title", "PURCHASE_AGREEMENT", "SIGNED", "REF",
-                LocalDateTime.parse(createdAt), source);
+                LocalDateTime.parse(createdAt), "", source);
     }
 
     private DocumentSnapshot snapshot(Source source, List<UnifiedDocument> docs) throws Exception {
