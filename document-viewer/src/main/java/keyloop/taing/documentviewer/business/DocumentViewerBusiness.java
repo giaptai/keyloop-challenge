@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import keyloop.taing.documentviewer.client.SalesClient;
@@ -93,14 +94,18 @@ public class DocumentViewerBusiness {
             CompletableFuture.runAsync(() -> _saveSnapshot(vin, Source.SALES, sales), executor);
             salesStatus = _statusOf(Source.SALES, null);
         } else {
-            LOGGER.warn("SALES call failed for vin={}", vin, errors[0]);
-            Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SALES);
-            if (snap.isPresent()) {
-                sales = snap.map(t -> _readDocuments(t)).orElse(List.of());
-                salesStatus = _staleStatus(snap.get());
-            } else {
+            LOGGER.warn("SALES call failed for vin={}, message={}", vin, errors[0].getMessage());
+            salesStatus = _statusOf(Source.SALES, errors[0]);
+            if ("NOT_FOUND".equals(salesStatus.status())) {
                 sales = List.of();
-                salesStatus = _statusOf(Source.SALES, errors[0]);
+            } else {
+                Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SALES);
+                if (snap.isPresent()) {
+                    sales = snap.map(t -> _readDocuments(t)).orElse(List.of());
+                    salesStatus = _staleStatus(snap.get());
+                } else {
+                    sales = List.of();
+                }
             }
         }
 
@@ -111,17 +116,24 @@ public class DocumentViewerBusiness {
             CompletableFuture.runAsync(() -> _saveSnapshot(vin, Source.SERVICE, services), executor);
             servicesStatus = _statusOf(Source.SERVICE, null);
         } else {
-            LOGGER.warn("SERVICE call failed for vin={}", vin, errors[1]);
-            Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SERVICE);
-            if (snap.isPresent()) {
-                services = snap.map(t -> _readDocuments(t)).orElse(List.of());
-                servicesStatus = _staleStatus(snap.get());
-            } else {
+            LOGGER.warn("SERVICE call failed for vin={}, message={}", vin, errors[1].getMessage());
+            servicesStatus = _statusOf(Source.SERVICE, errors[1]);
+            if ("NOT_FOUND".equals(servicesStatus.status())) {
                 services = List.of();
-                servicesStatus = _statusOf(Source.SERVICE, errors[1]);
+            } else {
+                Optional<DocumentSnapshot> snap = _loadSnapshot(vin, Source.SERVICE);
+                if (snap.isPresent()) {
+                    services = snap.map(t -> _readDocuments(t)).orElse(List.of());
+                    servicesStatus = _staleStatus(snap.get());
+                } else {
+                    services = List.of();
+                }
             }
         }
         if (!_isUsable(salesStatus) && !_isUsable(servicesStatus)) {
+            if ("NOT_FOUND".equals(salesStatus.status()) && "NOT_FOUND".equals(servicesStatus.status())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "VIN not found.");
+            }
             LOGGER.error("Both sources unavailable for vin={} sales={} service={}",
                     vin, salesStatus.status(), servicesStatus.status());
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Both APIs are unavailable.");
@@ -146,6 +158,9 @@ public class DocumentViewerBusiness {
         }
         if (cause instanceof SocketTimeoutException || cause instanceof TimeoutException) {
             return new SourceStatus(source, "TIMEOUT", "Timeout");
+        }
+        if (cause instanceof HttpClientErrorException.NotFound) {
+            return new SourceStatus(source, "NOT_FOUND", "VIN not found");
         }
         return new SourceStatus(source, "UNAVAILABLE", "API is not working");
     }

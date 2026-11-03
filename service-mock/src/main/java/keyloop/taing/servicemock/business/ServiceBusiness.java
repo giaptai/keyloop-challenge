@@ -30,4 +30,8 @@ public class ServiceBusiness {
     public List<ServiceDoc> getDocuments(String vin) {
         return services.getOrDefault(vin, List.of());
     }
+
+    public boolean vehicleExists(String vin){
+        return services.containsKey(vin);
+    }
 }

@@ -125,11 +125,7 @@ Number of documents per VIN in the mock data: [service](service-mock/src/main/re
 
 ### AI Collaboration Strategy
 
-I used AI to support me during development:
-- Understand the assignment requirements.
-- Generate unit tests, such as `DocumentViewerBusinessTest`.
-- Discuss technical choices, such as thread pool size and concurrent requests.
-- Find different ways to solve problems.
+I used an AI assistant to analyse the requirements, draft some classes and unit tests, and suggest thread pool settings. I made the main design decisions myself.
 
 ### Verification and Refinement
 
