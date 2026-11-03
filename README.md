@@ -10,6 +10,7 @@
 - [Build](#Build)
 - [Run](#Run)
 - [Test](#Test)
+- [AI Collaboration Narrative](#AI-Collaboration-Narrative)
 
 ## Overview
 | Module            | Port | Role                                      | Calls / Uses                                           |
@@ -119,3 +120,10 @@ Number of documents per VIN in the mock data: [service](service-mock/src/main/re
     curl "http://localhost:8082/api/sales/vehicles/1FTFW1ET5DFC10312/documents"
     curl "http://localhost:8083/api/service/vehicles/1FTFW1ET5DFC10312/documents"
     ```
+## AI Collaboration Narrative
+
+### AI Collaboration Strategy
+
+### Verification and Refinement
+
+### Final Code Quality
