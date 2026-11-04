@@ -1,7 +1,7 @@
 ## System Design Document – Unified Document Viewer
 
 ### 1. Architecture diagram
-![Overview](docs/keyloop-exercise-overview.drawio.png)
+![Overview](/docs/keyloop-exercise-overview.drawio.png)
 
 ### 2. Module description
 | Component | Responsibility |
@@ -34,7 +34,7 @@
 | Gradle (multi-module) | manages multi-modules, help them can run separately easier  |
 
 ### 5. Observability strategy
-- Logs (SLF4J) show each request’s result and any failure while the application runs. Every source reports a string status (OK, STALE, TIMEOUT, UNAVAILABLE) in the response, so the caller can see which source failed.
+- Logs (SLF4J) show each request’s result and any failure while the application runs. Every source reports a string status (OK, STALE, TIMEOUT, NOT_FOUND, UNAVAILABLE) in the response, so the caller can see which source failed.
 
 ### 6. AI assist in the design phase 
 I used AI at serveral stages:

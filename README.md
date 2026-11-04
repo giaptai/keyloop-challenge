@@ -110,10 +110,15 @@ Number of documents per VIN in the mock data: [service](service-mock/src/main/re
     curl "http://localhost:8081/api/v1/documents?vin=ABC"
     ```
 
-    No data for this VIN in either source (expect 200 with empty documents):
+    No data for this VIN in either source (expect 404):
     ```bash
     curl "http://localhost:8081/api/v1/documents?vin=JTDKB20U340012345"
     ```
+
+   VIN found only in Service (expect 200, SALES = NOT_FOUND):
+   ```bash
+   curl "http://localhost:8081/api/v1/documents?vin=JH4KA9650MC000001"
+   ```
 
     Mock APIs directly:
     ```bash
