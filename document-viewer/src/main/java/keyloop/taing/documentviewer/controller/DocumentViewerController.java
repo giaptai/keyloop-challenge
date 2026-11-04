@@ -27,6 +27,7 @@ public class DocumentViewerController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Documents retrieved successfully", content = @Content(schema = @Schema(implementation = SuccessRes.class))),
             @ApiResponse(responseCode = "400", description = "Invalid VIN", content = @Content(schema = @Schema(implementation = ErrorRes.class))),
+            @ApiResponse(responseCode = "404", description = "VIN Not Found", content = @Content(schema = @Schema(implementation = ErrorRes.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorRes.class))),
             @ApiResponse(responseCode = "503", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorRes.class)))
     })
